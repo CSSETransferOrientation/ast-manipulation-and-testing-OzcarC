@@ -10,6 +10,7 @@ from enum import Enum
 # distinguish between the addition and multiplication operators
 NodeType = Enum('BinOpNodeType', ['number', 'operator'])
 
+
 class BinOpAst():
     """
     A somewhat quick and dirty structure to represent a binary operator AST.
@@ -17,6 +18,7 @@ class BinOpAst():
     Reads input as a list of tokens in prefix notation, converts into internal representation,
     then can convert to prefix, postfix, or infix string output.
     """
+
     def __init__(self, prefix_list):
         """
         Initialize a binary operator AST from a given list in prefix notation.
@@ -37,9 +39,9 @@ class BinOpAst():
         Convert the binary tree printable string where indentation level indicates
         parent/child relationships
         """
-        ilvl = '  '*indent
-        left = '\n  ' + ilvl + self.left.__str__(indent+1) if self.left else ''
-        right = '\n  ' + ilvl + self.right.__str__(indent+1) if self.right else ''
+        ilvl = '  ' * indent
+        left = '\n  ' + ilvl + self.left.__str__(indent + 1) if self.left else ''
+        right = '\n  ' + ilvl + self.right.__str__(indent + 1) if self.right else ''
         return f"{ilvl}{self.val}{left}{right}"
 
     def __repr__(self):
@@ -67,6 +69,7 @@ class BinOpAst():
                 return self.val
             case NodeType.operator:
                 return '(' + self.left.infix_str() + ' ' + self.val + ' ' + self.right.infix_str() + ')'
+
     def postfix_str(self):
         """
         Convert the BinOpAst to a prefix notation string.
@@ -84,35 +87,70 @@ class BinOpAst():
         x + 0 = x
         """
         # IMPLEMENT ME!
-        pass
-                        
+        if self.val == None:
+            return
+        if self.type == NodeType.number:
+            return
+        elif self.type == NodeType.operator:
+            if self.val == "+":
+                if self.left.val == "0":
+                    temp = self.right
+                elif self.right.val == "0":
+                    temp = self.left
+                self.val = temp.val
+                self.type = temp.type
+                self.left = temp.left
+                self.right = temp.right
+
+            if self.left:
+                self.left.additive_identity()
+            if self.right:
+                self.right.additive_identity()
+
     def multiplicative_identity(self):
         """
         Reduce multiplicative identities
         x * 1 = x
         """
         # IMPLEMENT ME!
-        pass
-    
-    
+        if self.val == None:
+            return
+        if self.type == NodeType.number:
+            return
+        elif self.type == NodeType.operator:
+            if self.val == "*":
+                if self.left.val == "1":
+                    temp = self.right
+                elif self.right.val == "1":
+                    temp = self.left
+                self.val = temp.val
+                self.type = temp.type
+                self.left = temp.left
+                self.right = temp.right
+
+            if self.left:
+                self.left.multiplicative_identity()
+            if self.right:
+                self.right.multiplicative_identity()
+
     def mult_by_zero(self):
         """
-        Reduce multiplication by zero
+        Reduce multiplication by by_one
         x * 0 = 0
         """
         # Optionally, IMPLEMENT ME! (I'm pretty easy)
         pass
-    
+
     def constant_fold(self):
         """
         Fold constants,
         e.g. 1 + 2 = 3
         e.g. x + 2 = x + 2
         """
-        # Optionally, IMPLEMENT ME! This is a bit more challenging. 
+        # Optionally, IMPLEMENT ME! This is a bit more challenging.
         # You also likely want to add an additional node type to your AST
         # to represent identifiers.
-        pass            
+        pass
 
     def simplify_binops(self):
         """
@@ -126,6 +164,42 @@ class BinOpAst():
         self.multiplicative_identity()
         self.mult_by_zero()
         self.constant_fold()
+
+class BinOpTester (unittest.TestCase):
+    def test_additive_identity(self):
+        print(self.id())
+        ins = osjoin("testbench", "arith_id", "inputs")
+        outs = osjoin("testbench", "arith_id", "outputs")
+        for filename in os.listdir(ins):
+            in_path = osjoin(ins, filename)
+            out_path = osjoin(outs, filename)
+            if filename[0] != ".":
+                print(in_path, out_path)
+                with open(in_path,"r") as inFile, open(out_path,"r") as outFile:
+                    inp = list(inFile.readline().strip().split())
+                    expected = outFile.readline().strip()
+                t = BinOpAst(inp)
+                t.additive_identity()
+                solution = t.prefix_str()
+                self.assertEqual(solution, expected)
+
+
+    def test_multiplicative_identity(self):
+        print(self.id())
+        ins = osjoin("testbench", "mult_id", "inputs")
+        outs = osjoin("testbench", "mult_id", "outputs")
+        for filename in os.listdir(ins):
+            in_path = osjoin(ins, filename)
+            out_path = osjoin(outs, filename)
+            if filename[0] != ".":
+                print(in_path, out_path)
+                with open(in_path, "r") as inFile, open(out_path, "r") as outFile:
+                    inp = list(inFile.readline().strip().split())
+                    expected = outFile.readline().strip()
+                t = BinOpAst(inp)
+                t.multiplicative_identity()
+                solution = t.prefix_str()
+                self.assertEqual(solution, expected)
 
 
 if __name__ == "__main__":
