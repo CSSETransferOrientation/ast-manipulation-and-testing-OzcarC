@@ -13,3 +13,5 @@ This assignment was helpful in that I had never used a test bench like this befo
 
 I didn't dislike anything, but having self everywhere was confusing because I have not seen code in a while. It took a few more minutes than I would like to admit to figure out that it was just like "this" in other languages. So maybe giving a little more explaination on what the code is doing/what it means would have made starting much easier.
 
+
+;;> Tests are very sparse, missed some bugs. See code for details. Overall well done though!

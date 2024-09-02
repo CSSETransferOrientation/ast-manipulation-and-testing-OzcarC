@@ -102,6 +102,7 @@ class BinOpAst():
                 self.left = temp.left
                 self.right = temp.right
 
+            # ;;> You want to do the recursive calls first to "pull" values up, see the propogate test I added
             if self.left:
                 self.left.additive_identity()
             if self.right:
